@@ -3,6 +3,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
 
 from django.views import generic
 from .models import Question, Choice
@@ -13,7 +14,10 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_question_list'
 
     def get_queryset(self):
-        return Question.objects.order_by('-pub_date')[:5]
+        # filter to only get those whose pub dates are less than or equal to now
+        return Question.objects.filter(
+            pub_date__lte=timezone.now()
+        ).order_by('-pub_date')[:5]
 
 
 class DetailView(generic.DetailView):
